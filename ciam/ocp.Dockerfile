@@ -9,7 +9,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ciam/ciam.csproj", "ciam/"]
+COPY ["./ciam.csproj", "ciam/"]
 RUN dotnet restore "./ciam/ciam.csproj"
 COPY . .
 WORKDIR "/src/ciam"
