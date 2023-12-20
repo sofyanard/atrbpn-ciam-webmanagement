@@ -1,0 +1,108 @@
+﻿@{
+    @using Microsoft.AspNetCore.Http
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+}
+<h2 class="title-page float-left">
+    Event Login SSO
+</h2>
+<table id="table" class="table table-bordered" style="width:100%">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Event Type</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            Ciam.Models.EventModel[] data = ((Ciam.Models.EventModel[])ViewData["data"]);
+        }
+
+        @for (int i = 0; i < data.Length; i++)
+        {
+            <tr>
+                <td>
+                    <p>@(DateTimeOffset.FromUnixTimeMilliseconds(data[i].time).UtcDateTime.ToString("d MMMM yyyy"))</p>
+                    <p>@(DateTimeOffset.FromUnixTimeMilliseconds(data[i].time).UtcDateTime.ToString("HH:mm:ss"))</p>
+                </td>
+                <td>@data[i].type</td>
+                <td>
+                    <p><b>Realm:</b> @data[i].realmId</p>
+                    <p><b>Client:</b> @data[i].clientId</p>
+                    <p><b>User:</b> @data[i].userId</p>
+                    <p><b>IP Address:</b> @data[i].ipAddress</p>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    $(document).ready(function () {
+        $("#title").html("Event Login SSO");
+
+        getData();
+    });
+
+    function getData() {
+        $('#table thead tr')
+            .clone(true)
+            .addClass('filters')
+            .appendTo('#table thead');
+
+        var table = $('#table').DataTable({
+            dom: 'f<"table-overflow"t>lp',
+            orderCellsTop: true,
+            fixedHeader: true,
+            initComplete: function () {
+                var api = this.api();
+
+                // For each column
+                api
+                    .columns()
+                    .eq(0)
+                    .each(function (colIdx) {
+                        // Set the header cell to contain the input element
+                        var cell = $('.filters th').eq(
+                            $(api.column(colIdx).header()).index()
+                        );
+                        var title = $(cell).text();
+                        $(cell).html('<input type="text" placeholder="' + title + '" />');
+
+                        // On every keypress in this input
+                        $(
+                            'input',
+                            $('.filters th').eq($(api.column(colIdx).header()).index())
+                        )
+                            .off('keyup change')
+                            .on('change', function (e) {
+                                // Get the search value
+                                $(this).attr('title', $(this).val());
+                                var regexr = '({search})'; //$(this).parents('th').find('select').val();
+
+                                var cursorPosition = this.selectionStart;
+                                // Search the column for that value
+                                api
+                                    .column(colIdx)
+                                    .search(
+                                        this.value != ''
+                                            ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                            : '',
+                                        this.value != '',
+                                        this.value == ''
+                                    )
+                                    .draw();
+                            })
+                            .on('keyup', function (e) {
+                                e.stopPropagation();
+
+                                $(this).trigger('change');
+                                $(this)
+                                    .focus()[0]
+                                    .setSelectionRange(cursorPosition, cursorPosition);
+                            });
+                    });
+            },
+        });
+    }
+</script>

@@ -1,0 +1,328 @@
+﻿@{
+    @using Microsoft.AspNetCore.Http
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+}
+@{
+    Ciam.Models.AssignRoleModel[] assignedRole = ((Ciam.Models.AssignRoleModel[])ViewData["assignRole"]);
+    Ciam.Models.RoleModel[] listRole = ((Ciam.Models.RoleModel[])ViewData["listRole"]);
+}
+<div class="modal" id="defaultModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resetPassModalTitle">Reset Password</h5>
+                <button id="dismissModal" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formModal" action="@(Environment.GetEnvironmentVariable("base_url")+"user/reset/"+ViewData["id"])" method="post" style="display: none;">
+                    <div class="row mt-1">
+                        <div class="col-12">
+                            <label>New Password</label>
+                            <input class="form-control" type="password" id="password" name="password" required />
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-12">
+                            <label>Re-enter Password</label>
+                            <input class="form-control" type="password" id="repassword" required />
+                        </div>
+                    </div>
+                </form>
+                <button id="submitPassBtn" type="button" class="btn btn-primary" style="display: none;" onclick="updatePassword()">Save Changes</button>
+            </div>
+            <div class="modal-footer">
+                <button id="modalCloseBtn" type="button" class="btn btn-green" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="title-page float-left">
+    Edit Pengguna
+</h2>
+<div class="card-wrap clear-both p-0">
+    <form id="form" action="@(Environment.GetEnvironmentVariable("base_url")+"user/modify/"+ViewData["id"])" method="post">
+        <div class="p-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Nama Depan</label>
+                        <input class="form-control" type="text" name="firstName" required value="@ViewData["firstName"]" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Nama Belakang</label>
+                        <input class="form-control" type="text" name="lastName" required value="@ViewData["lastName"]" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input class="form-control" type="text" name="username" required value="@ViewData["username"]" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>email</label>
+                        <input class="form-control" type="text" name="email" required value="@ViewData["email"]" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Not Before</label>
+                        <input class="form-control" type="number" name="notBefore" required value="@ViewData["notBefore"]" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashed p-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Settings</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="enabled" value="true" @((bool.Parse(ViewData["enabled"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Enabled</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="totp" value="true" @((bool.Parse(ViewData["totp"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">TOTP</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="emailVerified" value="true" @((bool.Parse(ViewData["emailVerified"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Email Verified</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="manageGroupMembership" value="true" @((bool.Parse(ViewData["manageGroupMembership"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Manage Group Membership</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="mapRoles" value="true" @((bool.Parse(ViewData["mapRoles"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Map Roles</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="view" value="true" @((bool.Parse(ViewData["view"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">View</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="impersonate" value="true" @((bool.Parse(ViewData["impersonate"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Map Impersonate</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="manage" value="true" @((bool.Parse(ViewData["manage"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Manage</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Assign Role</label>
+                        <div id="assignRoles">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <select class="form-control mb-2" name="assignedRole[]">
+                                        <option selected value="@(assignedRole[0].id);@(assignedRole[0].name);@(assignedRole[0].description);@(assignedRole[0].composite);@(assignedRole[0].clientRole);@(assignedRole[0].containerId)">@(assignedRole[0].name)</option>
+                                        @for (int i = 0; i < listRole.Length; i++)
+                                        {
+                                            <option value="@(listRole[i].id);@(listRole[i].name);@(listRole[i].description);@(listRole[i].composite);@(listRole[i].clientRole);@(listRole[i].containerId)">@listRole[i].name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-danger removerole"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#" class="add-new-url addrole"><img src="@(Environment.GetEnvironmentVariable("base_url"))assets/images/plus-circle.png" alt="">Add new url</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-4">
+            <div class="text-right">
+                <button id="resetPasswordBtn" type="button" class="btn btn-info" data-toggle="modal" data-target="#defaultModal">Reset Password</button>
+                <button type="button" class="btn btn-danger" onclick="del()">Hapus</button>
+                <button type="button" class="btn btn-primary" onclick="save()">Update</button>
+            </div>
+        </div>
+    </form>
+</div>
+<form id="form2" action="@(Environment.GetEnvironmentVariable("base_url")+"user/del/"+ViewData["id"])" method="post" style="display: none;">
+    <button type="submit" style="display: none;"></button>
+</form>
+
+
+
+@*<h5 class="modal-title" id="resetPassModalTitle" style="display: none;">Reset Password</h5>
+<button id="dismissModal" type="button" class="close" data-dismiss="modal" aria-label="Close" style="display: none;">
+    <span aria-hidden="true">&times;</span>
+</button>
+<form id="formModal" action="@(Environment.GetEnvironmentVariable("base_url")+"user/reset/"+ViewData["id"])" method="post" style="display: none;">
+    <div class="row mt-1">
+        <div class="col-12">
+            <label>New Password</label>
+            <input class="form-control" type="password" id="password" name="password" required />
+        </div>
+    </div>
+    <div class="row mt-1">
+        <div class="col-12">
+            <label>Re-enter Password</label>
+            <input class="form-control" type="password" id="repassword" required />
+        </div>
+    </div>
+</form>
+<button id="submitPassBtn" type="button" class="btn btn-primary" style="display: none;" onclick="updatePassword()">
+    <i class="fa fa-save"></i>Save Changes
+</button>*@
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#title").html("Tambah Pengguna");
+
+        $(".addrole").click(function (e) {
+            e.preventDefault();
+
+            addRole('','','');
+        });
+
+        @{
+            Ciam.Models.AssignRoleModel[] assignRole = ((Ciam.Models.AssignRoleModel[])ViewData["assignRole"]);
+        }
+
+        @for(int i = 1; i < assignRole.Length; i++)
+        {
+            <text>
+                addRole('@(assignRole[i].id)','@(assignRole[i].name)','@(assignRole[i].description)','@(assignRole[i].composite)','@(assignRole[i].clientRole)','@(assignRole[i].containerId)');
+            </text>
+        }
+
+        $("#resetPasswordBtn").click(function (e) {
+            showModalHeader();
+            $('#resetPassModalTitle').appendTo('#defaultModal .modal-header');
+            $('#dismissModal').appendTo('#defaultModal .modal-header');
+
+            showModalContent();
+            $('#formModal').appendTo('#defaultModal .modal-body');
+            $('#submitPassBtn').appendTo('#defaultModal .modal-footer');
+        });
+        
+        $(document).on('click', '.removerole', function (e) {
+            e.preventDefault();
+            let row_item = $(this).parent().parent();
+            $(row_item).remove();
+        });
+    });
+
+    function showModalHeader() {
+        document.getElementById('resetPassModalTitle').style.display = 'block';
+        document.getElementById('dismissModal').style.display = 'inline-block';
+    }
+
+    function showModalContent() {
+        document.getElementById('formModal').style.display = 'table';
+        document.getElementById('submitPassBtn').style.display = 'inline-block';
+    }
+
+    function addRole(id,name,description,composite,clientRole,containerId) {
+        @{
+            Ciam.Models.RoleModel[] listsRole = ((Ciam.Models.RoleModel[])ViewData["listRole"]);
+        }
+        console.log(id,name,description,composite,clientRole,containerId);
+        var options = '<option value='+id+';'+name+';'+description+';'+composite+';'+clientRole+';'+containerId+'>'+name+'</option>';
+        @for (int i = 0; i < listsRole.Length; i++)
+        {
+            <text>
+            var option2 = '<option value="@(listsRole[i].id);@(listsRole[i].name);@(listsRole[i].description);@(listsRole[i].composite);@(listsRole[i].clientRole);@(listsRole[i].containerId)">@listsRole[i].name</option>';
+            var options = options + option2;
+            </text>
+        }
+        console.log(options)
+        console.log(id, name, description, composite, clientRole, containerId);
+        $("#assignRoles").append(
+            '<div class="row">'+
+                '<div class="col-md-10" >'+
+                    '<select class="form-control mb-2" name="assignedRole[]">'+options+'</select>'+
+                '</div>'+
+                '<div class="col-md-2 mt-1">'+
+                    '<button type="button" class="btn btn-danger removerole">'+'<i class="fa fa-minus"></i>'+'</button>'+
+                '</div>'+
+            '</div>'
+        );
+    }
+
+    function save() {
+        Swal.fire({
+            title: '<b>Konfirmasi Data</b>',
+            icon: 'info',
+            html: 'Data yang anda masukan sudah benar?',
+            showCloseButton: true,
+            showCancelButton: true,
+            focusConfirm: false,
+            confirmButtonText: '<i class="fa fa-check"></i> Ya',
+            confirmButtonAriaLabel: 'Thumbs up, great!',
+            cancelButtonText: '<i class="fa fa-close"></i> Batal'
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                $("#form").submit();
+            }
+        });
+    }
+
+    function del() {
+        Swal.fire({
+            title: '<b>Konfirmasi Data</b>',
+            icon: 'info',
+            html: 'Data akan dihapus?',
+            showCloseButton: true,
+            showCancelButton: true,
+            focusConfirm: false,
+            confirmButtonText: '<i class="fa fa-check"></i> Ya',
+            confirmButtonAriaLabel: 'Thumbs up, great!',
+            cancelButtonText: '<i class="fa fa-close"></i> Batal'
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                $("#form2").submit();
+            }
+        });
+    }
+
+    function updatePassword() {
+        if ($("#password").val() != $("#repassword").val()) {
+            Swal.fire(
+                'Periksa Kembali',
+                'Mohon periksa kembali password yang anda masukan, password tidak sama',
+                'error'
+            )
+        } else {
+            Swal.fire({
+                title: '<b>Konfirmasi Data</b>',
+                icon: 'info',
+                html: 'Password yang anda masukan sudah benar?',
+                showCloseButton: true,
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonText: '<i class="fa fa-check"></i> Ya',
+                confirmButtonAriaLabel: 'Thumbs up, great!',
+                cancelButtonText: '<i class="fa fa-close"></i> Batal'
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    $("#formModal").submit();
+                }
+            });
+        }
+    }
+</script>

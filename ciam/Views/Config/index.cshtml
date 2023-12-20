@@ -1,0 +1,103 @@
+﻿@{
+    @using Microsoft.AspNetCore.Http
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+}
+<h2 class="title-page">
+    Konfigurasi Koneksi SSO
+</h2>
+<div class="card-wrap">
+    <form id="form" action="@(Environment.GetEnvironmentVariable("base_url")+"config/setting")" method="post">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Host</label>
+                    <input class="form-control" type="text" name="host" required value="@ViewData["host"]" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Realm</label>
+                    <input class="form-control" type="text" name="realm" required value="@ViewData["realm"]" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Grand Type</label>
+                    <input class="form-control" type="text" name="grand_type" required value="@ViewData["grand_type"]" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Scope</label>
+                    <input class="form-control" type="text" name="scope" required value="@ViewData["scope"]" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Client ID</label>
+                    <input class="form-control" type="text" name="client_id" required value="@ViewData["client_id"]" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Client Secret</label>
+                    <input class="form-control" type="text" name="client_secret" required value="@ViewData["client_secret"]" />
+                </div>
+            </div>
+        </div>
+        <div class="text-right">
+            @if (HttpContextAccessor.HttpContext.Session.GetInt32("conn") == 1)
+            {
+                <button type="button" class="btn btn-danger" style="height: 50px;" onclick="disco()">Putus Konek</button>
+                <button type="button" class="btn btn-primary" onclick="save()">Konek</button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-primary" onclick="save()">Konek</button>
+            }
+        </div>
+    </form>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#title").html("Konfigurasi Koneksi SSO");
+    });
+
+    function save() {
+        Swal.fire({
+            title: '<b>Konfirmasi Data</b>',
+            icon: 'info',
+            html: 'Anda yakin akan memulai koneksi?',
+            showCloseButton: true,
+            showCancelButton: true,
+            focusConfirm: false,
+            confirmButtonText: '<i class="fa fa-check"></i> Ya',
+            confirmButtonAriaLabel: 'Thumbs up, great!',
+            cancelButtonText: '<i class="fa fa-close"></i> Batal'
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                $("#form").submit();
+            }
+        });
+    }
+
+    function disco() {
+        Swal.fire({
+            title: '<b>Konfirmasi Data</b>',
+            icon: 'info',
+            html: 'Anda yakin akan memutus koneksi?',
+            showCloseButton: true,
+            showCancelButton: true,
+            focusConfirm: false,
+            confirmButtonText: '<i class="fa fa-check"></i> Simpan',
+            confirmButtonAriaLabel: 'Thumbs up, great!',
+            cancelButtonText: '<i class="fa fa-close"></i> Batal'
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                window.href = "@(Environment.GetEnvironmentVariable("base_url") + "config/disco")";
+            }
+        });
+    }
+</script>

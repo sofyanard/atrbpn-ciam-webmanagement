@@ -1,0 +1,316 @@
+﻿@{
+    @using Microsoft.AspNetCore.Http
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+}
+@{
+    Ciam.Models.UserSessionClientModel[] userSessionClient = ((Ciam.Models.UserSessionClientModel[])ViewData["UserSession"]);
+}
+<div class="modal" id="defaultModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userSessionModalTitle">Active Session</h5>
+                <button id="dismissModal" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="userSessionTable" class="table table-hover">
+                    <thead style="background: #e0e0e0">
+                        <tr>
+                            <th class="text-start" style="width: 15%">User</th>
+                            <th class="text-start" style="width: 15%">From IP</th>
+                            <th class="text-start" style="width: 15%">Session Start</th>
+                            <th class="text-start" style="width: 15%">Last Active</th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 14px;">
+                        @for (int i = 0; i < userSessionClient.Length; i++)
+                        {
+                            <tr class="align-middle">
+                                <td><a style="color: #1a0dab;" href="@(Environment.GetEnvironmentVariable("base_url")+"user/edit/"+userSessionClient[i].userId)">@userSessionClient[i].username</a></td>
+                                <td>@userSessionClient[i].ipAddress</td>
+                                <td>@(DateTimeOffset.FromUnixTimeMilliseconds(userSessionClient[i].start).UtcDateTime.ToString("d MMMM yyyy"))</td>
+                                <td>@(DateTimeOffset.FromUnixTimeMilliseconds(userSessionClient[i].lastAccess).UtcDateTime.ToString("d MMMM yyyy"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button id="modalCloseBtn" type="button" class="btn btn-green text-uppercase" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="title-page float-left">
+    Edit Aplikasi
+</h2>
+<button id="userSessionBtn" type="button" class="btn btn-black float-right mt-4" data-toggle="modal" data-target="#defaultModal">Check Active Session</button>
+<div class="card-wrap clear-both p-0">
+    <form id="form" action="@(Environment.GetEnvironmentVariable("base_url")+"client/modify/"+ViewData["id"])" method="post">
+        <div class="p-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Client ID</label>
+                        <input class="form-control" type="text" name="clientId" required value="@ViewData["clientId"]" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Client Authenticator Type</label>
+                        <input class="form-control" type="text" name="clientAuthenticatorType" required value="@ViewData["clientAuthenticatorType"]" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Protocol</label>
+                        <input class="form-control" type="text" name="protocol" required value="@ViewData["protocol"]" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Not Before</label>
+                        <input class="form-control" type="number" name="notBefore" required value="@ViewData["notBefore"]" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Node Re-registration Timeout</label>
+                        <input class="form-control" type="number" min="-1" max="3600" name="nodeReRegistrationTimeout" required value="@ViewData["nodeReRegistrationTimeout"]" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashed p-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Settings</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="enabled" value="true" @((ViewData["enabled"] != null) ? ViewData["enabled"].ToString() : "false")>
+                                    <label class="custom-control-label" for="mySwitch">Enabled</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="surrogateAuthRequired" value="true" @((bool.Parse(ViewData["surrogateAuthRequired"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Surrogate Auth Required</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="alwaysDisplayInConsole" value="true" @((bool.Parse(ViewData["alwaysDisplayInConsole"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Always Display In Console</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="bearerOnly" value="true" @((bool.Parse(ViewData["bearerOnly"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Bearer Only</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="consentRequired" value="true" @((bool.Parse(ViewData["consentRequired"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Consent Required</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="standardFlowEnabled" value="true" @((bool.Parse(ViewData["standardFlowEnabled"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Standard Flow Enabled</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="implicitFlowEnabled" value="true" @((bool.Parse(ViewData["implicitFlowEnabled"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Implicit Flow Enabled</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="directAccessGrantsEnabled" value="true" @((bool.Parse(ViewData["directAccessGrantsEnabled"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Direct Access Grants Enabled</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="serviceAccountsEnabled" value="true" @((bool.Parse(ViewData["serviceAccountsEnabled"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Service Accounts Enabled</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="publicClient" value="true" @((bool.Parse(ViewData["publicClient"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Public Client</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="frontchannelLogout" value="true" @((bool.Parse(ViewData["frontchannelLogout"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Front Channel Logout</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="view" value="true" @((bool.Parse(ViewData["view"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Access View</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="configure" value="true" @((bool.Parse(ViewData["configure"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Access Configure</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="manage" value="true" @((bool.Parse(ViewData["manage"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Access Manage</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Redirect Url</label>
+                        <div id="redirectUris">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <input type="search" class="form-control mb-2" name="redirectUris[]" value="@((((string[]) ViewData["redirectUris"]).Count() > 0)?((string[]) ViewData["redirectUris"])[0]:"")" />
+                                </div>
+                                <div class="col-md-2 mt-1">
+                                    <button type="button" class="btn btn-danger removeuri"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#" class="add-new-url adduri"><img src="@(Environment.GetEnvironmentVariable("base_url"))assets/images/plus-circle.png" alt="">Add new url</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-4">
+            <div class="text-right">
+                <button type="button" class="btn btn-danger" onclick="del()">Hapus</button>
+                <button type="button" class="btn btn-primary" onclick="save()">Update</button>
+            </div>
+        </div>
+    </form>
+</div>
+<form id="form2" action="@(Environment.GetEnvironmentVariable("base_url")+"client/del/"+ViewData["id"])" method="post" style="display: none;">
+    <button type="submit" style="display: none;"></button>
+</form>
+
+@*<h5 class="modal-title" id="userSessionModalTitle" style="display: none;">Active Session</h5>
+<button id="dismissModal" type="button" class="close" data-dismiss="modal" aria-label="Close" style="display: none;">
+    <span aria-hidden="true">&times;</span>
+</button>
+<table id="userSessionTable" class="table table-hover" style="display: none;">
+    <thead style="background: #e0e0e0">
+        <tr>
+            <th class="text-start" style="width: 15%">User</th>
+            <th class="text-start" style="width: 15%">From IP</th>
+            <th class="text-start" style="width: 15%">Session Start</th>
+            <th class="text-start" style="width: 15%">Last Active</th>
+        </tr>
+    </thead>
+    <tbody style="font-size: 14px;">
+        @for (int i = 0; i < userSessionClient.Length; i++)
+        {
+            <tr class="align-middle">
+                <td><a style="color: #1a0dab;" href="@(Environment.GetEnvironmentVariable("base_url")+"user/edit/"+userSessionClient[i].userId)">@userSessionClient[i].username</a></td>
+                <td>@userSessionClient[i].ipAddress</td>
+                <td>@(DateTimeOffset.FromUnixTimeMilliseconds(userSessionClient[i].start).UtcDateTime.ToString("d MMMM yyyy"))</td>
+                <td>@(DateTimeOffset.FromUnixTimeMilliseconds(userSessionClient[i].lastAccess).UtcDateTime.ToString("d MMMM yyyy"))</td>
+            </tr>
+        }
+    </tbody>
+</table>*@
+
+<script type="text/javascript">
+    @{
+        Ciam.Models.UserSessionClientModel[] userSessionChecker = ((Ciam.Models.UserSessionClientModel[])ViewData["UserSession"]);
+    }
+    $(document).ready(function () {
+            $("#title").html("Edit Aplikasi");
+
+        $(".adduri").click(function (e) {
+            e.preventDefault();
+            addUri('');
+        });
+
+        @for(int i=1; i<((string[]) ViewData["redirectUris"]).Count(); i++)
+        {
+        <text>
+            addUri('@(((string[]) ViewData["redirectUris"])[i])');
+        </text>
+        }
+
+        //$("#userSessionBtn").click(function (e) {
+        //    showModalHeader();
+        //    $('#userSessionModalTitle').appendTo('#defaultModal .modal-header');
+        //    $('#dismissModal').appendTo('#defaultModal .modal-header');
+
+        //    if (userSessionChecker.Length > 0) 
+        //    {
+        //        <text>
+        //            showModalContent();
+        //            $('#userSessionTable').appendTo('#defaultModal .modal-body');
+        //        </text>
+        //    } else {
+        //        <text>
+        //            $('#exampleModal .modal-body').append('<p>No User Active Currently on this Client!</p>');
+        //        </text>
+        //    }
+        //});
+
+        $(document).on('click', '.removeuri', function (e) {
+            e.preventDefault();
+            let row_item = $(this).parent().parent();
+            $(row_item).remove();
+        });
+    });
+
+    function showModalHeader() {
+        document.getElementById('userSessionModalTitle').style.display = 'block';
+        document.getElementById('dismissModal').style.display = 'inline-block';
+    }
+
+    function showModalContent() {
+        document.getElementById('userSessionTable').style.display = 'table';
+    }
+
+    function addUri(param){
+        $("#redirectUris").append(
+            '<div class="row">'+
+                '<div class="col-md-10">'+
+                    '<input type="search" class="form-control mb-2" name="redirectUris[]" required value=' + param + '>'+
+                '</div>'+
+                '<div class="col-md-2 mt-1">'+
+                    '<button type="button" class="btn btn-danger removeuri">'+'<i class="fa fa-minus"></i>'+'</button>'+
+                '</div>'+
+            '</div>'
+        );
+    }
+
+    function save() {
+        Swal.fire({
+            title: '<b>Konfirmasi Data</b>',
+            icon: 'info',
+            html: 'Data yang anda masukan sudah benar?',
+            showCloseButton: true,
+            showCancelButton: true,
+            focusConfirm: false,
+            confirmButtonText: '<i class="fa fa-check"></i> Ya',
+            confirmButtonAriaLabel: 'Thumbs up, great!',
+            cancelButtonText: '<i class="fa fa-close"></i> Batal'
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                $("#form").submit();
+            }
+        });
+    }
+
+    function del() {
+        Swal.fire({
+            title: '<b>Konfirmasi Data</b>',
+            icon: 'info',
+            html: 'Data akan dihapus?',
+            showCloseButton: true,
+            showCancelButton: true,
+            focusConfirm: false,
+            confirmButtonText: '<i class="fa fa-check"></i> Ya',
+            confirmButtonAriaLabel: 'Thumbs up, great!',
+            cancelButtonText: '<i class="fa fa-close"></i> Batal'
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                $("#form2").submit();
+            }
+        });
+    }
+</script>

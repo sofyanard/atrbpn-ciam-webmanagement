@@ -1,0 +1,110 @@
+﻿@{
+    @using Microsoft.AspNetCore.Http
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+}
+<h2 class="title-page float-left">
+    List Pengguna SSO
+</h2>
+<a href="@(Environment.GetEnvironmentVariable("base_url")+"user/add")" type="button" class="btn btn-primary float-right mt-4">Tambah</a>
+<table id="table" class="table table-bordered" style="width:100%">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>User Name</th>
+            <th>Nama Depan</th>
+            <th>Nama Belakang</th>
+            <th>Enabled</th>
+            <th>ToTP</th>
+            <th>Email Verified</th>
+            <th>Dibuat Tanggal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            Ciam.Models.UserDataModel[] data = ((Ciam.Models.UserDataModel[])ViewData["data"]);
+        }
+
+        @for (int i = 0; i < data.Length; i++)
+        {
+            <tr>
+                <td>@(i + 1)</td>
+                <td><a style="color: #1a0dab;" href="@(Environment.GetEnvironmentVariable("base_url")+"user/edit/"+data[i].id)">@data[i].username</a></td>
+                <td>@data[i].firstName</td>
+                <td>@data[i].lastName</td>
+                <td>@data[i].enabled</td>
+                <td>@data[i].totp</td>
+                <td>@data[i].emailVerified</td>
+                <td>@(DateTimeOffset.FromUnixTimeMilliseconds(data[i].createdTimestamp).UtcDateTime.ToString("d MMMM yyyy"))</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    $(document).ready(function () {
+        $("#title").html("Pengaturan Pengguna SSO");
+
+        getData();
+    });
+
+    function getData() {
+        $('#table thead tr')
+            .clone(true)
+            .addClass('filters')
+            .appendTo('#table thead');
+
+        var table = $('#table').DataTable({
+            dom: 'f<"table-overflow"t>lp',
+            orderCellsTop: true,
+            fixedHeader: true,
+            initComplete: function () {
+                var api = this.api();
+
+                // For each column
+                api
+                    .columns()
+                    .eq(0)
+                    .each(function (colIdx) {
+                        // Set the header cell to contain the input element
+                        var cell = $('.filters th').eq(
+                            $(api.column(colIdx).header()).index()
+                        );
+                        var title = $(cell).text();
+                        $(cell).html('<input type="text" placeholder="' + title + '" />');
+
+                        // On every keypress in this input
+                        $(
+                            'input',
+                            $('.filters th').eq($(api.column(colIdx).header()).index())
+                        )
+                            .off('keyup change')
+                            .on('change', function (e) {
+                                // Get the search value
+                                $(this).attr('title', $(this).val());
+                                var regexr = '({search})'; //$(this).parents('th').find('select').val();
+
+                                var cursorPosition = this.selectionStart;
+                                // Search the column for that value
+                                api
+                                    .column(colIdx)
+                                    .search(
+                                        this.value != ''
+                                            ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                            : '',
+                                        this.value != '',
+                                        this.value == ''
+                                    )
+                                    .draw();
+                            })
+                            .on('keyup', function (e) {
+                                e.stopPropagation();
+
+                                $(this).trigger('change');
+                                $(this)
+                                    .focus()[0]
+                                    .setSelectionRange(cursorPosition, cursorPosition);
+                            });
+                    });
+            },
+        });
+    }
+</script>

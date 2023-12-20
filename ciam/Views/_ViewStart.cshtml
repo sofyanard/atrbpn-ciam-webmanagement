@@ -1,0 +1,14 @@
+﻿@{
+    string action = ((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)ViewContext.ActionDescriptor).ActionName;
+
+    string layout = "";
+    if (action == "Forgot" || action == "Register")
+    {
+        layout = "~/Views/Shared/_login.cshtml";
+    }
+    else
+    {
+        layout = "~/Views/Shared/_layout.cshtml";
+    }
+    Layout = layout;
+}

@@ -1,0 +1,106 @@
+﻿@{
+    @using Microsoft.AspNetCore.Http
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+}
+<h2 class="title-page float-left">
+    Tambah Pengguna
+</h2>
+<div class="card-wrap clear-both p-0">
+    <form id="form" action="@(Environment.GetEnvironmentVariable("base_url")+"user/create")" method="post">
+        <div class="p-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Nama Depan</label>
+                        <input class="form-control" type="text" name="firstName" required value="@ViewData["firstName"]" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Nama Belakang</label>
+                        <input class="form-control" type="text" name="lastName" required value="@ViewData["lastName"]" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input class="form-control" type="text" name="username" required value="@ViewData["username"]" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input class="form-control" type="text" name="email" required value="@ViewData["email"]" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input class="form-control" type="password" id="password" name="password" required />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Ulangi Password</label>
+                        <input class="form-control" type="password" id="repassword" required />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashed p-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Settings</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="enabled" value="true" @((ViewData["enabled"] != null) ? ViewData["enabled"].ToString() : "false")>
+                                    <label class="custom-control-label" for="mySwitch">Enabled</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-4">
+            <div class="text-right">
+                <button type="button" class="btn btn-primary" onclick="save()">Simpan</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#title").html("Tambah Pengguna");
+    });
+
+    function save() {
+        if ($("#password").val() != $("#repassword").val()) {
+            Swal.fire(
+                'Periksa Kembali',
+                'Mohon periksa kembali password yang anda masukan, password tidak sama',
+                'error'
+            )
+        } else {
+            Swal.fire({
+                title: '<b>Konfirmasi Data</b>',
+                icon: 'info',
+                html: 'Data yang anda masukan sudah benar?',
+                showCloseButton: true,
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonText: '<i class="fa fa-check"></i> Ya',
+                confirmButtonAriaLabel: 'Thumbs up, great!',
+                cancelButtonText: '<i class="fa fa-close"></i> Batal'
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    $("#form").submit();
+                }
+            });
+        }
+    }
+</script>

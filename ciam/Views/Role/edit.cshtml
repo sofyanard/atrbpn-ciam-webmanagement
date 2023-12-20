@@ -1,0 +1,111 @@
+﻿@{
+    @using Microsoft.AspNetCore.Http
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+}
+<h2 class="title-page float-left">
+    Edit Role
+</h2>
+<div class="card-wrap clear-both p-0">
+    <form id="form" action="@(Environment.GetEnvironmentVariable("base_url")+"role/modify/"+ViewData["id"])" method="post">
+        <div class="p-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Nama</label>
+                        <input class="form-control" type="text" name="firstName" required value="@ViewData["name"]" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Container Id</label>
+                        <input class="form-control" type="text" name="containerId" required value="@ViewData["containerId"]" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashed p-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Settings</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="enabled" value="true" @((ViewData["enabled"] != null) ? ViewData["enabled"].ToString() : "false")>
+                                    <label class="custom-control-label" for="mySwitch">Enabled</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="composite" value="true" @((bool.Parse(ViewData["composite"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Composite</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" type="checkbox" id="mySwitch" name="clientRole" value="true" @((bool.Parse(ViewData["clientRole"].ToString()) == true) ? "checked" : "")>
+                                    <label class="custom-control-label" for="mySwitch">Client Role</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Deskripsi</label>
+                        <textarea class="form-control" name="description" required>@ViewData["description"]</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-4">
+            <div class="text-right">
+                <button type="button" class="btn btn-danger" onclick="del()">Hapus</button>
+                <button type="button" class="btn btn-primary" onclick="save()">Simpan</button>
+            </div>
+        </div>
+    </form>
+</div>
+<form id="form2" action="@(Environment.GetEnvironmentVariable("base_url")+"role/del/"+ViewData["id"])" method="post" style="display: none;">
+    <button type="submit" style="display: none;"></button>
+</form>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#title").html("Edit Role");
+    });
+
+    function save() {
+        Swal.fire({
+            title: '<b>Konfirmasi Data</b>',
+            icon: 'info',
+            html: 'Data yang anda masukan sudah benar?',
+            showCloseButton: true,
+            showCancelButton: true,
+            focusConfirm: false,
+            confirmButtonText: '<i class="fa fa-check"></i> Ya',
+            confirmButtonAriaLabel: 'Thumbs up, great!',
+            cancelButtonText: '<i class="fa fa-close"></i> Batal'
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                $("#form").submit();
+            }
+        });
+    }
+
+    function del() {
+        Swal.fire({
+            title: '<b>Konfirmasi Data</b>',
+            icon: 'info',
+            html: 'Data akan dihapus?',
+            showCloseButton: true,
+            showCancelButton: true,
+            focusConfirm: false,
+            confirmButtonText: '<i class="fa fa-check"></i> Ya',
+            confirmButtonAriaLabel: 'Thumbs up, great!',
+            cancelButtonText: '<i class="fa fa-close"></i> Batal'
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                $("#form2").submit();
+            }
+        });
+    }
+</script>

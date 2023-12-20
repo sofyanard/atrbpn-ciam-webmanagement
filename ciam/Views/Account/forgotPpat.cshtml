@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html lang="en"> 
+<head>
+<title>BPN</title>
+<link rel="shortcut icon" href="@(Environment.GetEnvironmentVariable("base_url"))style/images/pin.png" type="image/x-icon" />
+<meta charset="utf-8">
+<meta name="description" content="bpn">
+<meta name="keywords" content="virual, offce, vo">
+<meta name="author" content="Luthfi Munadzar">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-touch-fullscreen" content="yes">
+
+<!-- Load Style -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="@(Environment.GetEnvironmentVariable("base_url"))style/css/app.css" media="screen">
+
+<!-- Load Scripts -->
+<script type="text/javascript" src="@(Environment.GetEnvironmentVariable("base_url"))style/js/main.min.js"></script>
+<script type="text/javascript" src="@(Environment.GetEnvironmentVariable("base_url"))style/js/scripts.js"></script>
+
+<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+</head>
+
+<body>
+
+	<div class="login">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-4 px-0">
+					<div class="login-panel" style="background-image: url('@(Environment.GetEnvironmentVariable("base_url"))style/images/typo.png')">
+						<img src="@(Environment.GetEnvironmentVariable("base_url"))style/images/bg.png" alt="" class="bg-bot">
+						<div class="wrap">
+							<div class="logo"><img src="@(Environment.GetEnvironmentVariable("base_url"))style/images/logo.png" alt=""/> 
+								<h5>Kementerian Agraria dan Tata Ruang / 
+								Badan Pertanahan Nasional</h5></div>
+	
+							<div class="login-wrap">
+								<h1>Lupa Password</h1>
+								<p>Masukan email anda untuk reset password anda</p>
+							
+								<form action="input-forgot-password.html">
+									<div class="wrap-input">
+										<img src="@(Environment.GetEnvironmentVariable("base_url"))style/images/user.png" alt="" class="prepend-icon">
+										<input type="email" class="form-control" placeholder="Alamat email">
+									</div>
+									<button type="submit" class="btn btn-primary w-100">Submit</button>
+									<div class="text-center">
+										<a href="index.html" class="register-link">Kembali ke login</a>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-8 px-0">
+					<div class="image" style="background-image: url('@(Environment.GetEnvironmentVariable("base_url"))style/images/bg-login.png')"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		$('#toggleHide').hide()
+		$('#toggleShow').on('click', function() {
+			$('#inputPassword').get(0).type = 'text';
+			$('#toggleShow').hide()
+			$('#toggleHide').show()
+		})
+		$('#toggleHide').on('click', function() {
+			$('#inputPassword').get(0).type = 'password';
+			$('#toggleHide').hide()
+			$('#toggleShow').show()
+		})
+	</script>
+
+</body>
+</html>

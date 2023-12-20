@@ -1,0 +1,44 @@
+﻿@{
+    @using Microsoft.AspNetCore.Http
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+}
+<link rel="stylesheet" href="@(Environment.GetEnvironmentVariable("base_url"))assets/css/datatables.min.css">
+<style>
+    .dataTables_filter {
+        width: 100%;
+        float: right;
+        text-align: right;
+        padding-right: 3%;
+    }
+
+    .dataTables_info {
+        margin-left: 3%;
+    }
+
+    .paginate_button current {
+        padding: 10px 40px;
+        border-radius: 7px;
+        color: #102E44;
+        border-color: #FEC32F;
+        font-size: 16px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+</style>
+@{
+    Ciam.Models.UserSessionClientModel[] userSessionClient = ((Ciam.Models.UserSessionClientModel[])ViewData["UserSession"]);
+}
+<div class="modal fade" id="defaultModal" style="z-index: -1;" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            </div>
+            <div class="modal-body pl-3 pr-3">
+            </div>
+            <div class="modal-footer">
+                <button id="modalCloseBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

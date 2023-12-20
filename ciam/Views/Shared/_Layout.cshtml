@@ -1,0 +1,193 @@
+﻿
+@{
+    @using Microsoft.AspNetCore.Http
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+}
+<style>
+    .dataTables_filter {
+        width: 100%;
+        float: right;
+        text-align: right;
+        padding-right: 3%;
+    }
+
+    .dataTables_info{
+        margin-left: 3%;
+    }
+
+    .paginate_button current {
+        padding: 10px 40px;
+        border-radius: 7px;
+        color: #102E44;
+        border-color: #FEC32F;
+        font-size: 16px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+</style>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="@(Environment.GetEnvironmentVariable("base_url"))assets/css/fontawesome.min.css">
+    <link rel="stylesheet" href="@(Environment.GetEnvironmentVariable("base_url"))assets/css/main.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="shortcut icon" href="@(Environment.GetEnvironmentVariable("base_url"))assets/images/logo.png" type="image/png" />
+    <title>Sistem CIAM</title>
+</head>
+<body>
+    <script type="text/javascript" src="@(Environment.GetEnvironmentVariable("base_url"))assets/js/jquery.slim.js"></script>
+    <script type="text/javascript" src="@(Environment.GetEnvironmentVariable("base_url"))assets/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <script type="text/javascript" src="@(Environment.GetEnvironmentVariable("base_url"))assets/js/sweetalert2.js"></script>
+    <aside class="sidebar-dashboard">
+        <a href="dashboard.html" class="logo-sidebar">
+            <img src="@(Environment.GetEnvironmentVariable("base_url"))assets/images/logo.png" alt="">
+            <h5>
+              Sistem CIAM
+            </h5>
+            <p>Kementerian ATR/BPN</p>
+        </a>
+        <span class="tmenu">MENU UTAMA</span>
+        <ul class="menu">
+            <li class="nav-item">
+              <a id="menuDash" href="/dashboard" class="nav-link active">
+                <img src="@(Environment.GetEnvironmentVariable("base_url"))assets/images/chart-square.png" alt="">
+                Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a id="menuConf" href="/config" class="nav-link">
+                <img src="@(Environment.GetEnvironmentVariable("base_url"))assets/images/setting-2.png" alt="">
+                Konfigurasi
+              </a>
+            </li>
+            <li class="nav-item">
+              <a id="menuApp" href="/client" class="nav-link">
+                <img src="@(Environment.GetEnvironmentVariable("base_url"))assets/images/monitor-1.png" alt="">
+                Aplikasi
+              </a>
+            </li>
+            <li class="nav-item">
+              <a id="menuRole" href="/role" class="nav-link">
+                <img src="@(Environment.GetEnvironmentVariable("base_url"))assets/images/setting-4-1.png" alt="">
+                Role
+              </a>
+            </li>
+            <li class="nav-item">
+              <a id="menuUser" href="/user" class="nav-link">
+                <img src="@(Environment.GetEnvironmentVariable("base_url"))assets/images/profile-2user-1.png" alt="">
+                Pengguna
+              </a>
+            </li>
+            <li class="nav-item">
+              <a id="menuEvent" href="/event" class="nav-link">
+                <img src="@(Environment.GetEnvironmentVariable("base_url"))assets/images/calendar-2-1.png" alt="">
+                Event
+              </a>
+            </li>
+            <li class="nav-item">
+              <a id="menuApi" href="/api/doc" class="nav-link">
+                <img src="@(Environment.GetEnvironmentVariable("base_url"))assets/images/calendar-2-1.png" alt="">
+                Dokumentasi API
+              </a>
+            </li>
+        </ul>
+        <div class="dropdown account">
+            <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+              <img src="@(Environment.GetEnvironmentVariable("base_url"))assets/images/avatar.png" alt="">
+              <h5>Admin</h5>
+              <span>admin@gmail.com</span>
+            </button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="#">Log Out</a>
+            </div>
+        </div>
+    </aside>
+    <main>
+        <div class="wrap">
+            <div class="topbar">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item active" aria-current="page" id="title">Dashboard</li>
+                    </ol>
+                </nav>
+                @if (HttpContextAccessor.HttpContext.Session.GetInt32("conn") == 1)
+                {
+                    <div class="koneksi">
+                        <span>Koneksi</span>
+                        <h4>@HttpContextAccessor.HttpContext.Session.GetString("realm")</h4>
+                        <img src="assets/images/wifi.png" alt="">
+                    </div>
+                }
+            </div>
+            @RenderBody()
+        </div>
+        <div class="footer-dashboard">
+            Copyright © 2023 Customer Identity Access Management Kementarian ATR/BPN 2023
+        </div>
+    </main>
+    <script type="text/javascript">
+        $(document).on('shown.bs.modal', '.modal', function () {
+            $('.modal-backdrop').before($(this));
+        });
+
+        $(document).ready(function() {
+            $("#menuDash").removeClass("active");
+            $("#menuConf").removeClass("active");
+            $("#menuUser").removeClass("active");
+            $("#menuApp").removeClass("active");
+            $("#menuRole").removeClass("active");
+            $("#menuEvent").removeClass("active");
+
+
+            var menu = window.location.href.split('/')[3];
+            if (menu == "dashboard") {
+                $("#menuDash").addClass("active");
+            } else if (menu == "config") {
+                $("#menuConf").addClass("active");
+            } else if (menu == "user") {
+                $("#menuUser").addClass("active");
+            } else if (menu == "client") {
+                $("#menuApp").addClass("active");
+            } else if (menu == "Role") {
+                $("#menuRole").addClass("active");
+            } else if (menu == "event") {
+                $("#menuEvent").addClass("active");
+            }
+
+            @if (ViewData["code"] == null) {
+
+            } else if (Convert.ToBoolean(ViewData["code"]) == true) {
+            <text>
+            Swal.fire({
+                title: '<b>Berhasil</b>',
+                icon: 'success',
+                html: '@ViewData["msg"]',
+                showCloseButton: true,
+                showCancelButton: false,
+                focusConfirm: false,
+                confirmButtonText: '<i class="fa fa-check"></i> Ok',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    location.href = "@ViewData["red"]";
+                }
+            });
+            </text>
+                    } else if (Convert.ToBoolean(ViewData["code"]) == false) {
+            <text>
+            Swal.fire(
+                'Gagal',
+                '@ViewData["msg"]',
+                'error'
+            )
+            </text>
+            }
+       });
+    </script>
+    @*@Html.Partial("_Modal")*@
+</body>
+</html>
