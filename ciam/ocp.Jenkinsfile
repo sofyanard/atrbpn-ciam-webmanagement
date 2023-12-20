@@ -11,7 +11,7 @@ node('base') {
     stage('Build and Deploy') {
         dir("source") {
             sh "mkdir -p build-folder/target/ build-folder/app/"
-            sh "cp ocp.Dockerfile build-folder/Dockerfile"
+            sh "cp ciam/ocp.Dockerfile build-folder/Dockerfile"
             sh "cp ciam/ciam.csproj build-folder"
 
             def tag = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim();
