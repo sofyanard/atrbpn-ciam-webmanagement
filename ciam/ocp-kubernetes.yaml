@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-management
+  namespace: webmanagement-dev
+spec:
+  type: LoadBalancer
+  selector:
+    app: web-management
+  ports:
+  - name: apps
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-management
+  namespace: webmanagement-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-management
+  template:
+    metadata:
+      labels:
+        app: web-management
+    spec:
+      containers:
+      - name: web-management
+        image: $REGISTRY/$HARBOR_NAMESPACE/$APP_NAME:$BUILD_NUMBER
+        ports:
+        - name: apps
+          containerPort: 8080
+          protocol: TCP
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1000Mi"
+          requests:
+            cpu: "0.5"
+            memory: "500Mi"
+
+---
+
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: web-management
+  namespace: webmanagement-dev
+spec:
+  to:
+    kind: Service
+    name: web-management
+  port:
+    targetPort: apps
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
